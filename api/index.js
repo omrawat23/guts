@@ -57,7 +57,7 @@ app.post('/login', async (req, res) => {
   if (passOk) {
     jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      res.cookie('token', token, { httpOnly: true }).json({
+      res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'None' }).json({
         id: userDoc._id,
         username,
       });
@@ -71,10 +71,12 @@ app.post('/login', async (req, res) => {
 app.get('/profile', (req, res) => {
   const { token } = req.cookies;
   console.log('Token in request:', token); // Log token for debugging
+  
   if (!token) {
-    console.warn('Token missing in request:', req.cookies);
+    console.warn('Token missing in request cookies:', req.cookies);
     return res.status(400).json({ error: 'Token missing' });
   }
+
   jwt.verify(token, secret, {}, (err, info) => {
     if (err) {
       console.error('Token verification failed:', err);
@@ -87,8 +89,9 @@ app.get('/profile', (req, res) => {
 
 
 
+
 app.post('/logout', (req,res) => {
-  res.cookie('token', '').json('ok');
+  res.cookie('token', '', { httpOnly: true, secure: true, sameSite: 'None' }).json('ok');
 });
 
 app.post('/post', upload.single('file'), async (req, res) => {
