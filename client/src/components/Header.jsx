@@ -19,14 +19,12 @@ const Header = () => {
         } else {
           throw new Error('Failed to load profile');
         }
-      })
-      .then(userInfo => {
+      }).then(userInfo => {
         setUserInfo(userInfo);
-      })
-      .catch(error => {
+      }).catch(error => {
         console.error('Error fetching profile:', error);
       });
-  }, [setUserInfo]);
+    }, []);
 
   const logout = () => {
     fetch(`${import.meta.env.VITE_BACKEND_URL}/logout`, {
@@ -34,16 +32,15 @@ const Header = () => {
       method: 'POST',
     })
       .then(response => {
-        if (response.ok) {
-          setUserInfo(null);
-        } else {
-          console.error('Failed to log out');
-        }
-      })
-      .catch(error => {
-        console.error('Error logging out:', error);
-      });
-  };
+      if (response.ok) {
+        setUserInfo(null);
+      } else {
+        console.error('Failed to log out');
+      }
+    }).catch(error => {
+      console.error('Error logging out:', error);
+    });
+  }
 
   const username = userInfo?.username;
 
