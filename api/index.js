@@ -70,10 +70,11 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', (req, res) => {
   const { token } = req.cookies;
-  console.log('Token in request:', token); // Log token for debugging
-  
+  console.log('Token in request:', token);
+  console.log('All cookies:', req.cookies);
+
   if (!token) {
-    console.warn('Token missing in request cookies:', req.cookies);
+    console.warn('Token missing in request cookies');
     return res.status(400).json({ error: 'Token missing' });
   }
 
@@ -82,12 +83,10 @@ app.get('/profile', (req, res) => {
       console.error('Token verification failed:', err);
       return res.status(401).json({ error: 'Unauthorized' });
     }
+    console.log('Token verified successfully, user info:', info);
     res.json(info);
   });
 });
-
-
-
 
 
 app.post('/logout', (req,res) => {
