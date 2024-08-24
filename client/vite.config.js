@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        target: 'https://guts-dun.vercel.app',
         changeOrigin: true,
         secure: false,
         ws: true,
