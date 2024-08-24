@@ -50,20 +50,16 @@ app.post('/register', async (req,res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-  const userDoc = await User.findOne({ username });
+app.post('/login', async (req,res) => {
+  const {username,password} = req.body;
+  const userDoc = await User.findOne({username});
   const passOk = bcrypt.compareSync(password, userDoc.password);
   if (passOk) {
-    jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
+    // logged in
+    jwt.sign({username,id:userDoc._id}, secret, {}, (err,token) => {
       if (err) throw err;
-      res.cookie('token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        domain: '.vercel.app' // or the specific domain you're using
-      }).json({
-        id: userDoc._id,
+      res.cookie('token', token).json({
+        id:userDoc._id,
         username,
       });
     });
@@ -72,30 +68,33 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
 app.get('/profile', (req, res) => {
   const { token } = req.cookies;
-  console.log('Token in request:', token);
-  console.log('All cookies:', req.cookies);
-
   if (!token) {
-    console.warn('Token missing in request cookies');
+    console.warn('Token missing in request:', req.cookies);
     return res.status(400).json({ error: 'Token missing' });
   }
-
   jwt.verify(token, secret, {}, (err, info) => {
     if (err) {
-      console.error('Token verification failed:', err);
-      return res.status(401).json({ error: 'Unauthorized' });
+      if (err.name === 'TokenExpiredError') {
+        console.error('Token expired:', err);
+        return res.status(401).json({ error: 'Token expired' });
+      } else if (err.name === 'JsonWebTokenError') {
+        console.error('Invalid token:', err);
+        return res.status(401).json({ error: 'Invalid token' });
+      } else {
+        console.error('Token verification failed:', err);
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
     }
-    console.log('Token verified successfully, user info:', info);
     res.json(info);
   });
 });
 
 
+
 app.post('/logout', (req,res) => {
-  res.cookie('token', '', { httpOnly: true, secure: true, sameSite: 'None' }).json('ok');
+  res.cookie('token', '').json('ok');
 });
 
 app.post('/post', upload.single('file'), async (req, res) => {
@@ -201,4 +200,3 @@ const PORT = 4000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
