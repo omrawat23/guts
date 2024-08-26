@@ -5,7 +5,7 @@ import backgroundImage from '../assets/guts.png';
 function Intro() {
   return (
     <div className="relative min-h-screen flex flex-col">
-      {/* <Header /> */}
+      <Header />
       <main className="flex-grow">
         <img
           src={backgroundImage}
