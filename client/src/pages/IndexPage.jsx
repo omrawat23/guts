@@ -16,11 +16,17 @@ export default function IndexPage() {
   return (
     <div className="bg-dark p-6 min-h-screen">
       <Intro />
-      <div className="grid grid-cols-1 gap-6">
-        {posts.length > 0 &&
-          posts.map((post) => (
-            <Post key={post.id} {...post} />
-          ))}
+      <div className="container mx-auto">
+        <h1 className="text-4xl font-bold text-gray-100 my-8 text-center">Blogs</h1>
+        <div className="grid grid-cols-1 gap-6">
+          {posts.length > 0 ? (
+            posts.map((post) => (
+              <Post key={post._id} {...post} />
+            ))
+          ) : (
+            <p className="text-gray-400 text-center">No posts available</p>
+          )}
+        </div>
       </div>
     </div>
   );

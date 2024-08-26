@@ -1,50 +1,50 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { UserContext } from '../UserContext';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from "react";
+import { UserContext } from "../UserContext";
+import { Link } from "react-router-dom";
 import logo from "../assets/logo.svg";
-import menu from "../assets/menu.png";
-import { Button } from './ui/button';
+import menu from "../assets/mi.png";
+import { Button } from "./ui/button";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { setUserInfo, userInfo } = useContext(UserContext);
 
   useEffect(() => {
-    if (!userInfo) {  // Avoid fetching if userInfo is already set
+    if (!userInfo) {
       fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
-        method: 'GET',
-        credentials: 'include',
+        method: "GET",
+        credentials: "include",
       })
-        .then(response => {
+        .then((response) => {
           if (response.ok) {
             return response.json();
           } else {
-            throw new Error('Failed to load profile');
+            throw new Error("Failed to load profile");
           }
         })
-        .then(userInfo => {
+        .then((userInfo) => {
           setUserInfo(userInfo);
         })
-        .catch(error => {
-          console.error('Error fetching profile:', error);
+        .catch((error) => {
+          console.error("Error fetching profile:", error);
         });
     }
   }, [setUserInfo, userInfo]);
 
   const logout = () => {
     fetch(`${import.meta.env.VITE_BACKEND_URL}/logout`, {
-      credentials: 'include',
-      method: 'POST',
+      credentials: "include",
+      method: "POST",
     })
-      .then(response => {
+      .then((response) => {
         if (response.ok) {
           setUserInfo(null);
         } else {
-          console.error('Failed to log out');
+          console.error("Failed to log out");
         }
       })
-      .catch(error => {
-        console.error('Error logging out:', error);
+      .catch((error) => {
+        console.error("Error logging out:", error);
       });
   };
 
@@ -64,34 +64,55 @@ const Header = () => {
         <ul className="flex space-x-6 mr-6">
           {username ? (
             <>
-              <li><Link to="/create" className="text-white hover:text-gray-200">Create new post</Link></li>
               <li>
-                <button
+                <Button
+                  asChild
+                  className="text-white hover:text-gray-200 focus:outline-none"
+                >
+                  <Link to="/create">Create new post</Link>
+                </Button>
+              </li>
+              <li>
+                <Button
                   onClick={logout}
                   className="text-white hover:text-gray-200 focus:outline-none"
                   aria-label={`Logout ${username}`}
                 >
                   Logout ({username})
-                </button>
+                </Button>
               </li>
             </>
           ) : (
             <>
-              <li><Link to="/login" className="text-white hover:text-gray-200">Log in</Link></li>
-              <li><Link to="/register" className="text-white hover:text-gray-200">Register</Link></li>
+              <li>
+                <Button
+                  asChild
+                  className="text-white hover:text-gray-200"
+                >
+                  <Link to="/login">Log in</Link>
+                </Button>
+              </li>
+              <li>
+                <Button
+                  asChild
+                  className="text-white hover:text-gray-200"
+                >
+                  <Link to="/register">Register</Link>
+                </Button>
+              </li>
             </>
           )}
         </ul>
       </nav>
 
       {/* Mobile Menu Button */}
-      <button
+      <Button
         className="md:hidden"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         aria-label="Toggle Menu"
       >
         <img src={menu} alt="Menu" className="h-6 w-6" />
-      </button>
+      </Button>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
@@ -100,21 +121,42 @@ const Header = () => {
             <ul className="flex flex-col items-center space-y-4 mb-4">
               {username ? (
                 <>
-                  <li><Link to="/create" className="text-white hover:text-gray-600">Create new post</Link></li>
                   <li>
-                    <button
+                    <Button
+                      asChild
+                      className="text-white hover:text-gray-600"
+                    >
+                      <Link to="/create">Create new post</Link>
+                    </Button>
+                  </li>
+                  <li>
+                    <Button
                       onClick={logout}
                       className="text-white hover:text-gray-600 focus:outline-none"
                       aria-label={`Logout ${username}`}
                     >
                       Logout ({username})
-                    </button>
+                    </Button>
                   </li>
                 </>
               ) : (
                 <>
-                  <li><Link to="/login" className="text-white hover:text-gray-600">Log in</Link></li>
-                  <li><Link to="/register" className="text-white hover:text-gray-600">Register</Link></li>
+                  <li>
+                    <Button
+                      asChild
+                      className="text-white hover:text-gray-600"
+                    >
+                      <Link to="/login">Log in</Link>
+                    </Button>
+                  </li>
+                  <li>
+                    <Button
+                      asChild
+                      className="text-white hover:text-gray-600"
+                    >
+                      <Link to="/register">Register</Link>
+                    </Button>
+                  </li>
                 </>
               )}
             </ul>

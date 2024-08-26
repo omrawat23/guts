@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import Editor from "../Editor";
-import { Button } from "../components/ui/button"; // Assuming you have a Button component in your project
+import {Button} from "../components/ui/button"; // Assuming you have a Button component in your project
 import vid from "../assets/guts1.mp4"; // Video asset
 
 export default function EditPost() {
   const { id } = useParams();
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [content, setContent] = useState('');
+  const [title, setTitle] = useState("");
+  const [summary, setSummary] = useState("");
+  const [content, setContent] = useState("");
   const [files, setFiles] = useState(null);
   const [redirect, setRedirect] = useState(false);
+  const [redirectToHome, setRedirectToHome] = useState(false); // New state for redirection to home
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_BACKEND_URL}/post/` + id)
-      .then(response => response.json())
-      .then(postInfo => {
+      .then((response) => response.json())
+      .then((postInfo) => {
         setTitle(postInfo.title);
         setContent(postInfo.content);
         setSummary(postInfo.summary);
@@ -26,17 +27,17 @@ export default function EditPost() {
   async function updatePost(ev) {
     ev.preventDefault();
     const data = new FormData();
-    data.set('title', title);
-    data.set('summary', summary);
-    data.set('content', content);
-    data.set('id', id);
+    data.set("title", title);
+    data.set("summary", summary);
+    data.set("content", content);
+    data.set("id", id);
     if (files?.[0]) {
-      data.set('file', files[0]);
+      data.set("file", files[0]);
     }
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/post`, {
-      method: 'PUT',
+      method: "PUT",
       body: data,
-      credentials: 'include',
+      credentials: "include",
     });
     if (response.ok) {
       setRedirect(true);
@@ -44,17 +45,24 @@ export default function EditPost() {
   }
 
   const Delete = async () => {
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/post/${id}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/post/${id}`,
+      {
+        method: "DELETE",
+        credentials: "include",
+      }
+    );
     if (response.ok) {
-      setRedirect(true);
+      setRedirectToHome(true); // Set redirectToHome to true on successful deletion
     }
+  };
+
+  if (redirectToHome) {
+    return <Navigate to="/" />; // Redirect to the homepage
   }
 
   if (redirect) {
-    return <Navigate to={`/post/${id}`} />;
+    return <Navigate to={`/post/${id}`} />; // Redirect to the post page
   }
 
   return (
@@ -75,24 +83,28 @@ export default function EditPost() {
             type="text"
             placeholder="Title"
             value={title}
-            onChange={ev => setTitle(ev.target.value)}
+            onChange={(ev) => setTitle(ev.target.value)}
             className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-900 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-600"
           />
           <input
             type="text"
             placeholder="Summary"
             value={summary}
-            onChange={ev => setSummary(ev.target.value)}
+            onChange={(ev) => setSummary(ev.target.value)}
             className="w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-900 text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-600"
           />
           <input
             type="file"
-            onChange={ev => setFiles(ev.target.files)}
+            onChange={(ev) => setFiles(ev.target.files)}
             className="w-full border border-gray-700 rounded-md bg-gray-900 text-gray-100 focus:outline-none"
           />
           <Editor value={content} onChange={setContent} />
-          <Button type="submit" style={{ marginTop: '5px' }}>Update Post</Button>
-          <Button type="button" onClick={Delete} style={{ marginTop: '5px' }}>Delete Post</Button>
+          <Button type="submit" style={{ marginTop: "5px" }}>
+            Update Post
+          </Button>
+          <Button type="button" onClick={Delete} style={{ marginTop: "5px" }}>
+            Delete Post
+          </Button>
         </form>
       </div>
     </div>
