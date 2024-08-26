@@ -12,7 +12,6 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <UserContextProvider>
-        <Header />
         <App />
       </UserContextProvider>
     </BrowserRouter>
