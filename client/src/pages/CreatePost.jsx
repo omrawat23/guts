@@ -21,6 +21,7 @@ export default function CreatePost() {
     const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/post`, {
       method: 'POST',
       body: data,
+      mode: 'no-cors', // Use with caution; this limits error handling.
       credentials: 'include',
     });
     if (response.ok) {

@@ -6,7 +6,7 @@ import backgroundImage from "../assets/guts.png";
 function Intro() {
   return (
         <div className="relative min-h-screen">
-          <Header />
+          {/* <Header /> */}
           <main className="w-full h-full">
             <img src={backgroundImage} className="w-full h-auto object-cover" alt="Blog banner" />
           </main>
