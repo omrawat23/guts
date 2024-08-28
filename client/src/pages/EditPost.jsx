@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import Editor from "../Editor";
-import {Button} from "../components/ui/button"; // Assuming you have a Button component in your project
+import Button from "../components/ui/button"; // Assuming you have a Button component in your project
 import vid from "../assets/guts1.mp4"; // Video asset
 
 export default function EditPost() {

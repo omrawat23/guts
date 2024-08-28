@@ -1,9 +1,9 @@
 import React, { useState, useContext, useEffect } from "react";
 import { UserContext } from "../UserContext";
 import { Link } from "react-router-dom";
-import logo from "../assets/logo.svg";
+import logo from "../assets/log.svg";
 import menu from "../assets/mi.png";
-import { Button } from "./ui/button";
+import Button from "./ui/Button"; // Updated import statement
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,8 +54,9 @@ const Header = () => {
     <header className="flex items-center justify-between px-6 py-4 bg-transparent absolute top-0 left-0 right-0 z-10">
       <a href="/" aria-label="Home">
         <div className="flex items-center">
-          <img src={logo} alt="Crotus logo" className="h-6 w-6 mr-2" />
-          <span className="text-xl font-semibold text-teal-600">crotus</span>
+          <Button>
+            <img src={logo} alt="logo" className="h-6 w-6" /> {/* Adjusted size */}
+          </Button>
         </div>
       </a>
 
@@ -97,7 +98,7 @@ const Header = () => {
                   asChild
                   className="text-white hover:text-gray-200"
                 >
-                  <Link to="/register">Register</Link>
+                  <Link to="/register">SIGN IN</Link>
                 </Button>
               </li>
             </>
@@ -111,14 +112,14 @@ const Header = () => {
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         aria-label="Toggle Menu"
       >
-        <img src={menu} alt="Menu" className="h-6 w-6" />
+        <img src={menu} alt="Menu" className="h-6 w-6" /> {/* Consistent size */}
       </Button>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="absolute bg-black top-full right-12 shadow-md rounded-3xl md:hidden transition-transform duration-300">
-          <nav className="flex flex-col items-center py-4">
-            <ul className="flex flex-col items-center space-y-4 mb-4">
+          <nav className="flex flex-col items-center py-4 px-4">
+            <ul className="flex flex-col items-center space-y-4">
               {username ? (
                 <>
                   <li>
@@ -154,15 +155,12 @@ const Header = () => {
                       asChild
                       className="text-white hover:text-gray-600"
                     >
-                      <Link to="/register">Register</Link>
+                      <Link to="/register">SIGN IN</Link>
                     </Button>
                   </li>
                 </>
               )}
             </ul>
-            <Button className="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 transition duration-300">
-              Get started →
-            </Button>
           </nav>
         </div>
       )}
