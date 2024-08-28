@@ -3,7 +3,7 @@ import { UserContext } from "../UserContext";
 import { Link } from "react-router-dom";
 import logo from "../assets/log.svg";
 import menu from "../assets/mi.png";
-import Button from "./ui/Button"; // Updated import statement
+import Button from "./ui/button"; // Updated import statement
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
