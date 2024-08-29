@@ -27,7 +27,11 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 const storage = getStorage();
 
-app.use(cors({ origin: 'https://guts-fx13.vercel.app', credentials: true }));
+app.use(cors({
+   origin: 'https://guts-fx13.vercel.app', 
+   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"] }));
+  
 app.use(express.json());
 app.use(cookieParser());
 
