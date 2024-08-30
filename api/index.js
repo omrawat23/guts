@@ -27,25 +27,7 @@ const firebaseConfig = {
 initializeApp(firebaseConfig);
 const storage = getStorage();
 
-const allowedOrigins = [
-  'https://guts-fx13.vercel.app',
-  'http://localhost:5173'
-];
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
-
+app.use(cors({ origin: 'https://guts-fx13.vercel.app', credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -127,12 +109,12 @@ app.post('/post', upload.single('file'), async (req, res) => {
 app.put('/post', upload.single('file'), async (req, res) => {
   const { token } = req.cookies;
   jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) return res.status(401).json('Invalid token'); // Return 401 if token is invalid
+    if (err) throw err;
 
     const { id, title, summary, content } = req.body;
     const postDoc = await Post.findById(id);
     if (postDoc.author.toString() !== info.id) {
-      return res.status(403).json('You are not the author'); // Return 403 if unauthorized
+      return res.status(400).json('you are not the author');
     }
 
     let imageUrl = postDoc.cover;
@@ -146,7 +128,6 @@ app.put('/post', upload.single('file'), async (req, res) => {
     res.json(postDoc);
   });
 });
-
 
 app.get('/post', async (req, res) => {
   const posts = await Post.find()
