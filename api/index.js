@@ -107,14 +107,28 @@ app.post('/post', upload.single('file'), async (req, res) => {
 });
 
 app.put('/post', upload.single('file'), async (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const info = await new Promise((resolve, reject) => {
+      jwt.verify(token, secret, {}, (err, decoded) => {
+        if (err) reject(err);
+        else resolve(decoded);
+      });
+    });
 
     const { id, title, summary, content } = req.body;
     const postDoc = await Post.findById(id);
+    
+    if (!postDoc) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
     if (postDoc.author.toString() !== info.id) {
-      return res.status(400).json('you are not the author');
+      return res.status(403).json({ error: 'You are not the author' });
     }
 
     let imageUrl = postDoc.cover;
@@ -126,8 +140,12 @@ app.put('/post', upload.single('file'), async (req, res) => {
 
     await postDoc.updateOne({ title, summary, content, cover: imageUrl });
     res.json(postDoc);
-  });
+  } catch (error) {
+    console.error('Error updating post:', error);
+    res.status(500).json({ error: 'An error occurred while updating the post' });
+  }
 });
+
 
 app.get('/post', async (req, res) => {
   const posts = await Post.find()
