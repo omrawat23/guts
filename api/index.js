@@ -125,26 +125,41 @@ app.post('/post', upload.single('file'), async (req, res) => {
 });
 
 app.put('/post', upload.single('file'), async (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
-
-    const { id, title, summary, content } = req.body;
-    const postDoc = await Post.findById(id);
-    if (postDoc.author.toString() !== info.id) {
-      return res.status(400).json('you are not the author');
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      return res.status(401).json('Unauthorized: No token provided');
     }
 
-    let imageUrl = postDoc.cover;
-    if (req.file) {
-      const storageRef = ref(storage, `images/${Date.now()}_${req.file.originalname}`);
-      await uploadBytes(storageRef, req.file.buffer);
-      imageUrl = await getDownloadURL(storageRef);
-    }
+    jwt.verify(token, secret, {}, async (err, info) => {
+      if (err) {
+        return res.status(401).json('Unauthorized: Invalid token');
+      }
 
-    await postDoc.updateOne({ title, summary, content, cover: imageUrl });
-    res.json(postDoc);
-  });
+      const { id, title, summary, content } = req.body;
+      const postDoc = await Post.findById(id);
+      if (!postDoc) {
+        return res.status(404).json('Post not found');
+      }
+
+      if (postDoc.author.toString() !== info.id) {
+        return res.status(403).json('Forbidden: You are not the author');
+      }
+
+      let imageUrl = postDoc.cover;
+      if (req.file) {
+        const storageRef = ref(storage, `images/${Date.now()}_${req.file.originalname}`);
+        await uploadBytes(storageRef, req.file.buffer);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
+      await postDoc.updateOne({ title, summary, content, cover: imageUrl });
+      res.json(postDoc);
+    });
+  } catch (error) {
+    console.error('Error in PUT /post:', error);
+    res.status(500).json('Internal Server Error');
+  }
 });
 
 app.get('/post', async (req, res) => {

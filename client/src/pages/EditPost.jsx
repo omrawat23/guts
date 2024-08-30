@@ -26,23 +26,32 @@ export default function EditPost() {
 
   async function updatePost(ev) {
     ev.preventDefault();
-    const data = new FormData();
-    data.set("title", title);
-    data.set("summary", summary);
-    data.set("content", content);
-    data.set("id", id);
-    if (files?.[0]) {
-      data.set("file", files[0]);
-    }
-    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/post`, {
-      method: "PUT",
-      body: data,
-      credentials: "include",
-    });
-    if (response.ok) {
+    try {
+      const data = new FormData();
+      data.set("title", title);
+      data.set("summary", summary);
+      data.set("content", content);
+      data.set("id", id);
+      if (files?.[0]) {
+        data.set("file", files[0]);
+      }
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/post`, {
+        method: "PUT",
+        body: data,
+        credentials: "include",
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to update post: ${response.statusText}`);
+      }
+  
       setRedirect(true);
+    } catch (error) {
+      console.error('Error updating post:', error);
+      alert('An error occurred while updating the post. Please try again later.');
     }
   }
+  
 
   const Delete = async () => {
     const response = await fetch(
