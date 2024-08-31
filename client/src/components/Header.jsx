@@ -10,29 +10,39 @@ const Header = () => {
   const { setUserInfo, userInfo } = useContext(UserContext);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch(`/api/profile`, {
-          method: "GET",
-          credentials: "include",
+    // Check if session exists in localStorage
+    const storedUserInfo = localStorage.getItem("userInfo");
+
+    if (storedUserInfo) {
+      setUserInfo(JSON.parse(storedUserInfo));
+    } else {
+      fetch(`/api/profile`, {
+        method: "GET",
+        credentials: "include",
+      })
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+          } else if (response.status === 401) {
+            // Unauthorized access, handle accordingly
+            setUserInfo(null);
+            localStorage.removeItem("userInfo");
+            return null;
+          } else {
+            throw new Error("Failed to load profile");
+          }
+        })
+        .then((userInfo) => {
+          if (userInfo) {
+            setUserInfo(userInfo);
+            localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Store session in localStorage
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching profile:", error);
         });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch profile: ${response.statusText}`);
-        }
-        const userInfo = await response.json();
-        setUserInfo(userInfo);
-        localStorage.setItem("userInfo", JSON.stringify(userInfo));
-      } catch (error) {
-        console.error("Error fetching profile:", error.message);
-        // Optionally clear userInfo in case of errors
-        setUserInfo(null);
-        localStorage.removeItem("userInfo");
-      }
-    };
-  
-    fetchProfile();
+    }
   }, [setUserInfo]);
-  
 
   const logout = () => {
     fetch(`/api/logout`, {
