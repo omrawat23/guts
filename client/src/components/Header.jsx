@@ -3,19 +3,14 @@ import { UserContext } from "../UserContext";
 import { Link } from "react-router-dom";
 import logo from "../assets/log.svg";
 import menu from "../assets/mi.png";
-import Button from "./ui/button";
+import Button from "./ui/button"; // Updated import statement
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { setUserInfo, userInfo } = useContext(UserContext);
 
   useEffect(() => {
-    // Check if session exists in localStorage
-    const storedUserInfo = localStorage.getItem("userInfo");
-
-    if (storedUserInfo) {
-      setUserInfo(JSON.parse(storedUserInfo));
-    } else {
+    if (!userInfo) {
       fetch(`/api/profile`, {
         method: "GET",
         credentials: "include",
@@ -29,13 +24,12 @@ const Header = () => {
         })
         .then((userInfo) => {
           setUserInfo(userInfo);
-          localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Store session in localStorage
         })
         .catch((error) => {
           console.error("Error fetching profile:", error);
         });
     }
-  }, [setUserInfo]);
+  }, [setUserInfo, userInfo]);
 
   const logout = () => {
     fetch(`/api/logout`, {
@@ -45,7 +39,6 @@ const Header = () => {
       .then((response) => {
         if (response.ok) {
           setUserInfo(null);
-          localStorage.removeItem("userInfo"); // Clear session on logout
         } else {
           console.error("Failed to log out");
         }
@@ -59,13 +52,13 @@ const Header = () => {
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-transparent absolute top-0 left-0 right-0 z-10">
-      <Link to="/" aria-label="Home">
+      <a href="/" aria-label="Home">
         <div className="flex items-center">
           <Button>
-            <img src={logo} alt="logo" className="h-6 w-6" />
+            <img src={logo} alt="logo" className="h-6 w-6" /> {/* Adjusted size */}
           </Button>
         </div>
-      </Link>
+      </a>
 
       {/* Desktop Navigation */}
       <nav className="hidden md:flex items-center">
@@ -119,15 +112,14 @@ const Header = () => {
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         aria-label="Toggle Menu"
       >
-        <img src={menu} alt="Menu" className="h-6 w-6" />
+        <img src={menu} alt="Menu" className="h-6 w-6" /> {/* Consistent size */}
       </Button>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-       <div className="absolute bg-black top-full right-12 shadow-md rounded-3xl md:hidden transition-transform duration-300 w-64">
-        <nav className="flex flex-col items-center py-4 px-4">
-          <ul className="flex flex-col items-center space-y-4">
-
+        <div className="absolute bg-black top-full right-12 shadow-md rounded-3xl md:hidden transition-transform duration-300">
+          <nav className="flex flex-col items-center py-4 px-4">
+            <ul className="flex flex-col items-center space-y-4">
               {username ? (
                 <>
                   <li>
