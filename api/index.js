@@ -36,13 +36,30 @@ mongoose.connect('mongodb+srv://or63529:wLuePpf02OQrK4Qr@cluster0.vrmua9i.mongod
 // Multer setup for handling file uploads
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Middleware to verify token
+const verifyToken = (req, res, next) => {
+  const { token } = req.cookies;
+  if (!token) return res.status(401).json({ error: 'Token missing' });
+
+  jwt.verify(token, secret, {}, (err, info) => {
+    if (err) {
+      const errorMap = {
+        TokenExpiredError: 'Token expired',
+        JsonWebTokenError: 'Invalid token',
+      };
+      return res.status(401).json({ error: errorMap[err.name] || 'Unauthorized' });
+    }
+    req.userInfo = info; // Add user info to request
+    next();
+  });
+};
+
+// Routes
 app.post('/register', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const userDoc = await User.create({
-      username,
-      password: bcrypt.hashSync(password, salt),
-    });
+    const hashedPassword = bcrypt.hashSync(password, salt);
+    const userDoc = await User.create({ username, password: hashedPassword });
     res.json(userDoc);
   } catch (e) {
     res.status(400).json(e);
@@ -55,86 +72,62 @@ app.post('/login', async (req, res) => {
   if (userDoc && bcrypt.compareSync(password, userDoc.password)) {
     jwt.sign({ username, id: userDoc._id }, secret, {}, (err, token) => {
       if (err) throw err;
-      // Secure cookies for production
-res.cookie('token', token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: 'None',
-}).json({ id: userDoc._id, username });
+      res.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'None',
+      }).json({ id: userDoc._id, username });
     });
   } else {
-    res.status(400).json('wrong credentials');
+    res.status(400).json('Wrong credentials');
   }
 });
 
-app.get('/profile', (req, res) => {
-  const { token } = req.cookies;
-  if (!token) return res.status(400).json({ error: 'Token missing' });
-  
-  jwt.verify(token, secret, {}, (err, info) => {
-    if (err) {
-      const errorMap = {
-        TokenExpiredError: 'Token expired',
-        JsonWebTokenError: 'Invalid token',
-      };
-      return res.status(401).json({ error: errorMap[err.name] || 'Unauthorized' });
-    }
-    res.json(info);
-  });
+app.get('/profile', verifyToken, (req, res) => {
+  res.json(req.userInfo);
 });
 
 app.post('/logout', (req, res) => {
-  // Secure cookies for production
-res.cookie('token', '', {
-  httpOnly: true,
-  secure: true,
-  sameSite: 'None',
-}).json('ok');
+  res.cookie('token', '', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'None',
+  }).json('ok');
 });
 
-app.post('/post', upload.single('file'), async (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
+app.post('/post', upload.single('file'), verifyToken, async (req, res) => {
+  const { title, summary, content } = req.body;
+  const storageRef = ref(storage, `images/${Date.now()}_${req.file.originalname}`);
+  await uploadBytes(storageRef, req.file.buffer);
+  const imageUrl = await getDownloadURL(storageRef);
 
-    const { title, summary, content } = req.body;
+  const postDoc = await Post.create({
+    title,
+    summary,
+    content,
+    cover: imageUrl,
+    author: req.userInfo.id,
+  });
+
+  res.json(postDoc);
+});
+
+app.put('/post', upload.single('file'), verifyToken, async (req, res) => {
+  const { id, title, summary, content } = req.body;
+  const postDoc = await Post.findById(id);
+  if (postDoc.author.toString() !== req.userInfo.id) {
+    return res.status(403).json('You are not the author');
+  }
+
+  let imageUrl = postDoc.cover;
+  if (req.file) {
     const storageRef = ref(storage, `images/${Date.now()}_${req.file.originalname}`);
     await uploadBytes(storageRef, req.file.buffer);
-    const imageUrl = await getDownloadURL(storageRef);
+    imageUrl = await getDownloadURL(storageRef);
+  }
 
-    const postDoc = await Post.create({
-      title,
-      summary,
-      content,
-      cover: imageUrl,
-      author: info.id,
-    });
-
-    res.json(postDoc);
-  });
-});
-
-app.put('/post', upload.single('file'), async (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
-
-    const { id, title, summary, content } = req.body;
-    const postDoc = await Post.findById(id);
-    if (postDoc.author.toString() !== info.id) {
-      return res.status(400).json('you are not the author');
-    }
-
-    let imageUrl = postDoc.cover;
-    if (req.file) {
-      const storageRef = ref(storage, `images/${Date.now()}_${req.file.originalname}`);
-      await uploadBytes(storageRef, req.file.buffer);
-      imageUrl = await getDownloadURL(storageRef);
-    }
-
-    await postDoc.updateOne({ title, summary, content, cover: imageUrl });
-    res.json(postDoc);
-  });
+  await postDoc.updateOne({ title, summary, content, cover: imageUrl });
+  res.json(postDoc);
 });
 
 app.get('/post', async (req, res) => {
@@ -147,23 +140,22 @@ app.get('/post', async (req, res) => {
 
 app.get('/post/:id', async (req, res) => {
   const postDoc = await Post.findById(req.params.id).populate('author', ['username']);
-  res.json(postDoc);
+  if (postDoc) {
+    res.json(postDoc);
+  } else {
+    res.status(404).json({ error: 'Post not found' });
+  }
 });
 
-app.delete('/post/:id', async (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) return res.status(401).json({ error: 'Unauthorized' });
+app.delete('/post/:id', verifyToken, async (req, res) => {
+  const postDoc = await Post.findById(req.params.id);
+  if (!postDoc) return res.status(404).json({ error: 'Post not found' });
+  if (postDoc.author.toString() !== req.userInfo.id) {
+    return res.status(403).json({ error: 'You are not authorized to delete this post' });
+  }
 
-    const postDoc = await Post.findById(req.params.id);
-    if (!postDoc) return res.status(404).json({ error: 'Post not found' });
-    if (postDoc.author.toString() !== info.id) {
-      return res.status(403).json({ error: 'You are not authorized to delete this post' });
-    }
-
-    await postDoc.deleteOne();
-    res.json({ message: 'Post deleted successfully' });
-  });
+  await postDoc.deleteOne();
+  res.json({ message: 'Post deleted successfully' });
 });
 
 const PORT = 4000;

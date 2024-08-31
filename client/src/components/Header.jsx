@@ -10,32 +10,29 @@ const Header = () => {
   const { setUserInfo, userInfo } = useContext(UserContext);
 
   useEffect(() => {
-    // Check if session exists in localStorage
-    const storedUserInfo = localStorage.getItem("userInfo");
-
-    if (storedUserInfo) {
-      setUserInfo(JSON.parse(storedUserInfo));
-    } else {
-      fetch(`/api/profile`, {
-        method: "GET",
-        credentials: "include",
-      })
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } else {
-            throw new Error("Failed to load profile");
-          }
-        })
-        .then((userInfo) => {
-          setUserInfo(userInfo);
-          localStorage.setItem("userInfo", JSON.stringify(userInfo)); // Store session in localStorage
-        })
-        .catch((error) => {
-          console.error("Error fetching profile:", error);
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch(`/api/profile`, {
+          method: "GET",
+          credentials: "include",
         });
-    }
+        if (!response.ok) {
+          throw new Error(`Failed to fetch profile: ${response.statusText}`);
+        }
+        const userInfo = await response.json();
+        setUserInfo(userInfo);
+        localStorage.setItem("userInfo", JSON.stringify(userInfo));
+      } catch (error) {
+        console.error("Error fetching profile:", error.message);
+        // Optionally clear userInfo in case of errors
+        setUserInfo(null);
+        localStorage.removeItem("userInfo");
+      }
+    };
+  
+    fetchProfile();
   }, [setUserInfo]);
+  
 
   const logout = () => {
     fetch(`/api/logout`, {
@@ -124,10 +121,9 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-       <div className="absolute bg-black top-full right-12 shadow-md rounded-3xl md:hidden transition-transform duration-300 w-64">
-        <nav className="flex flex-col items-center py-4 px-4">
-          <ul className="flex flex-col items-center space-y-4">
-
+        <div className="absolute bg-black top-full right-12 shadow-md rounded-3xl md:hidden transition-transform duration-300 w-64">
+          <nav className="flex flex-col items-center py-4 px-4">
+            <ul className="flex flex-col items-center space-y-4">
               {username ? (
                 <>
                   <li>
