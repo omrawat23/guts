@@ -11,21 +11,27 @@ export default function LoginPage() {
 
   async function login(ev) {
     ev.preventDefault();
-    const response = await fetch(`/api/login`, {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-    });
-    if (response.ok) {
-      response.json().then(userInfo => {
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const userInfo = await response.json();
         setUserInfo(userInfo);
         setRedirect(true);
-      });
-    } else {
-      alert('Wrong credentials');
+      } else {
+        const errorText = await response.text();
+        alert(`Error: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Login Error:', error);
+      alert('An error occurred. Please try again.');
     }
   }
+  
 
   if (redirect) {
     return <Navigate to={'/'} />;
