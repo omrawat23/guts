@@ -12,11 +12,11 @@ export default function LoginPage() {
 async function login(ev) {
   ev.preventDefault();
   try {
-    const response = await fetch(`/${import.meta.env.VITE_BACKEND_URL}/login`, {
+    const response = await fetch(`/api/login`, {
       method: 'POST',
       body: JSON.stringify({ username, password }),
       headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
+      mode: 'no-cors', 
     });
     if (response.ok) {
       const userInfo = await response.json();

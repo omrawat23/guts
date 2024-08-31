@@ -5,7 +5,7 @@ const Homepage = ({ userId }) => {
 
   useEffect(() => {
     // Fetch user's blog posts from an API endpoint
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/posts?userId=${userId}`)
+    fetch(`/posts?userId=${userId}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch user posts');

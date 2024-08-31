@@ -16,9 +16,9 @@ const Header = () => {
     if (storedUserInfo) {
       setUserInfo(JSON.parse(storedUserInfo));
     } else {
-      fetch(`${import.meta.env.VITE_BACKEND_URL}/profile`, {
+      fetch(`/api/profile`, {
         method: "GET",
-        credentials: "include",
+        mode: 'no-cors',
       })
         .then((response) => {
           if (response.ok) {
@@ -45,8 +45,8 @@ const Header = () => {
   }, [setUserInfo]);
 
   const logout = () => {
-    fetch(`${import.meta.env.VITE_BACKEND_URL}/logout`, {
-      credentials: "include",
+    fetch(`/api/logout`, {
+      mode: 'no-cors', 
       method: "POST",
     })
       .then((response) => {
