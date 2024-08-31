@@ -14,7 +14,7 @@ export default function EditPost() {
   const [redirectToHome, setRedirectToHome] = useState(false); // New state for redirection to home
 
   useEffect(() => {
-    fetch(`/api/post/` + id)
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/post/` + id)
       .then((response) => response.json())
       .then((postInfo) => {
         setTitle(postInfo.title);
@@ -35,7 +35,7 @@ export default function EditPost() {
       if (files?.[0]) {
         data.set("file", files[0]);
       }
-      const response = await fetch(`/api/post`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/post`, {
         method: "PUT",
         body: data,
         credentials: "include",
@@ -55,7 +55,7 @@ export default function EditPost() {
 
   const Delete = async () => {
     const response = await fetch(
-      `/api/post/${id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/post/${id}`,
       {
         method: "DELETE",
         credentials: "include",

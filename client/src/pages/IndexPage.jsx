@@ -7,7 +7,7 @@ export default function IndexPage() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetch(`/api/post`)
+    fetch(`${import.meta.env.VITE_BACKEND_URL}/post`)
       .then(response => response.json())
       .then(posts => setPosts(posts))
       .catch(error => console.error('Error fetching posts:', error));
