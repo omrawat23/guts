@@ -37,8 +37,7 @@ export default function EditPost() {
       }
       const response = await fetch(`/api/post`, {
         method: "PUT",
-        body: data,
-        mode: 'no-cors', 
+        body: data, 
       });
   
       if (!response.ok) {
@@ -58,7 +57,6 @@ export default function EditPost() {
       `/api/post/${id}`,
       {
         method: "DELETE",
-        mode: 'no-cors', 
       }
     );
     if (response.ok) {

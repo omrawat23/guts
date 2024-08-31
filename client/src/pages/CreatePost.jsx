@@ -21,7 +21,6 @@ export default function CreatePost() {
     const response = await fetch(`/api/post`, {
       method: 'POST',
       body: data,
-      mode: 'no-cors', 
     });
     if (response.ok) {
       setRedirect(true);

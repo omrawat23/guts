@@ -18,7 +18,6 @@ const Header = () => {
     } else {
       fetch(`/api/profile`, {
         method: "GET",
-        mode: 'no-cors',
       })
         .then((response) => {
           if (response.ok) {
@@ -45,8 +44,7 @@ const Header = () => {
   }, [setUserInfo]);
 
   const logout = () => {
-    fetch(`/api/logout`, {
-      mode: 'no-cors', 
+    fetch(`/api/logout`, { 
       method: "POST",
     })
       .then((response) => {
