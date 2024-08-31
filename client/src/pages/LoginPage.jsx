@@ -9,29 +9,29 @@ export default function LoginPage() {
   const [redirect, setRedirect] = useState(false);
   const { setUserInfo } = useContext(UserContext);
 
-  async function login(ev) {
-    ev.preventDefault();
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        body: JSON.stringify({ username, password }),
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
-      if (response.ok) {
-        const userInfo = await response.json();
-        setUserInfo(userInfo);
-        setRedirect(true);
-      } else {
-        const errorText = await response.text();
-        alert(`Error: ${errorText}`);
-      }
-    } catch (error) {
-      console.error('Login Error:', error);
-      alert('An error occurred. Please try again.');
+async function login(ev) {
+  ev.preventDefault();
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    if (response.ok) {
+      const userInfo = await response.json();
+      setUserInfo(userInfo);
+      setRedirect(true);
+    } else {
+      const errorText = await response.text();
+      alert(`Error: ${errorText}`);
     }
+  } catch (error) {
+    console.error('Login Error:', error);
+    alert('An error occurred. Please try again.');
   }
-  
+}
+
 
   if (redirect) {
     return <Navigate to={'/'} />;
