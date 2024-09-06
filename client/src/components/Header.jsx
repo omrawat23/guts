@@ -5,6 +5,8 @@ import logo from "../assets/log.svg";
 import menu from "../assets/mi.png";
 import Button from "./ui/button";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { setUserInfo, userInfo } = useContext(UserContext);
@@ -16,7 +18,7 @@ const Header = () => {
     if (storedUserInfo) {
       setUserInfo(JSON.parse(storedUserInfo));
     } else {
-      fetch(`/api/profile`, {
+      fetch(`${apiBaseUrl}/profile`, {
         method: "GET",
       })
         .then((response) => {
@@ -44,7 +46,7 @@ const Header = () => {
   }, [setUserInfo]);
 
   const logout = () => {
-    fetch(`/api/logout`, { 
+    fetch(`${apiBaseUrl}/logout`, { 
       method: "POST",
     })
       .then((response) => {

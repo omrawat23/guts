@@ -8,7 +8,7 @@ export default defineConfig({
       '/api': {
         target: 'https://guts-1.onrender.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

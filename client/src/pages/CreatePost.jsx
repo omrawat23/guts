@@ -4,6 +4,7 @@ import {useState} from "react";
 import {Navigate} from "react-router-dom";
 import Editor from "../Editor";
 import vid from "../assets/guts1.mp4"
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function CreatePost() {
   const [title,setTitle] = useState('');
@@ -18,7 +19,7 @@ export default function CreatePost() {
     data.set('content', content);
     data.set('file', files[0]);
     ev.preventDefault();
-    const response = await fetch(`/api/post`, {
+    const response = await fetch(`${apiBaseUrl}/post`, {
       method: 'POST',
       body: data,
     });

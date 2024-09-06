@@ -1,5 +1,6 @@
 import { useState } from "react";
 import vid from "../assets/purp.mp4"
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -7,7 +8,7 @@ export default function RegisterPage() {
 
   async function register(ev) {
     ev.preventDefault();
-    const response = await fetch(`/api/register`, {
+    const response = await fetch(`${apiBaseUrl}/register`, {
       method: 'POST',
       body: JSON.stringify({ username, password }),
       headers: { 'Content-Type': 'application/json' },

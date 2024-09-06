@@ -3,6 +3,8 @@ import { Navigate } from "react-router-dom";
 import { UserContext } from "../UserContext";
 import vid from "../assets/guts-anime.mp4"
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -12,7 +14,7 @@ export default function LoginPage() {
 async function login(ev) {
   ev.preventDefault();
   try {
-    const response = await fetch(`/api/login`, {
+    const response = await fetch(`${apiBaseUrl}/login`, {
       method: 'POST',
       body: JSON.stringify({ username, password }),
       headers: { 'Content-Type': 'application/json' },

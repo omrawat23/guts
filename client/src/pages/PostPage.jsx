@@ -4,6 +4,7 @@ import { formatISO9075 } from "date-fns";
 import { UserContext } from "../UserContext";
 import { Link } from "react-router-dom";
 import Button from "../components/ui/button";
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function PostPage() {
   const [postInfo, setPostInfo] = useState(null);
@@ -11,7 +12,7 @@ export default function PostPage() {
   const { id } = useParams();
 
   useEffect(() => {
-    fetch(`/api/post/${id}`)
+    fetch(`${apiBaseUrl}/post/${id}`)
       .then((response) => response.json())
       .then((postInfo) => {
         setPostInfo(postInfo);

@@ -3,11 +3,12 @@ import Post from "../Post";
 import { useEffect, useState } from "react";
 import Intro from "./Intro";
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 export default function IndexPage() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    fetch(`/api/post`)
+    fetch(`${apiBaseUrl}/post`)
       .then(response => response.json())
       .then(posts => setPosts(posts))
       .catch(error => console.error('Error fetching posts:', error));

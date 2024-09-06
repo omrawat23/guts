@@ -3,6 +3,7 @@ import { Navigate, useParams } from "react-router-dom";
 import Editor from "../Editor";
 import Button from "../components/ui/button"; // Assuming you have a Button component in your project
 import vid from "../assets/guts1.mp4"; // Video asset
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditPost() {
   const { id } = useParams();
@@ -14,7 +15,7 @@ export default function EditPost() {
   const [redirectToHome, setRedirectToHome] = useState(false); // New state for redirection to home
 
   useEffect(() => {
-    fetch(`/api/post/` + id)
+    fetch(`${apiBaseUrl}/post/` + id)
       .then((response) => response.json())
       .then((postInfo) => {
         setTitle(postInfo.title);
@@ -35,7 +36,7 @@ export default function EditPost() {
       if (files?.[0]) {
         data.set("file", files[0]);
       }
-      const response = await fetch(`/api/post`, {
+      const response = await fetch(`${apiBaseUrl}/post`, {
         method: "PUT",
         body: data, 
       });
@@ -54,7 +55,7 @@ export default function EditPost() {
 
   const Delete = async () => {
     const response = await fetch(
-      `/api/post/${id}`,
+      `${apiBaseUrl}/post/${id}`,
       {
         method: "DELETE",
       }
