@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../src/components/Header';
 import backgroundImageDesktop from '../assets/be.png';
-import backgroundImageMobile from '../assets/bee.jpeg'; // Assume this is your mobile image
+import backgroundImageMobile from '../assets/In.png'; // Assume this is your mobile image
 
 function Intro() {
   const [isMobile, setIsMobile] = useState(false);
