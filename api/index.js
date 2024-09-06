@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const cors = require('cors')
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const { initializeApp } = require('firebase/app');
@@ -28,6 +29,11 @@ const storage = getStorage();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: 'https://guts-z422.vercel.app',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // MongoDB connection
 mongoose.set('strictQuery', true);
