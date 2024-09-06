@@ -32,6 +32,7 @@ app.use(cookieParser());
 app.use(cors({
   origin: 'https://guts-z422.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -99,9 +100,14 @@ res.cookie('token', '', {
 });
 
 app.post('/post', upload.single('file'), async (req, res) => {
-  const { token } = req.cookies;
-  jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
+  try {
+    const { token } = req.cookies;
+    const info = await new Promise((resolve, reject) => {
+      jwt.verify(token, secret, {}, (err, info) => {
+        if (err) reject(err);
+        resolve(info);
+      });
+    });
 
     const { title, summary, content } = req.body;
     const storageRef = ref(storage, `images/${Date.now()}_${req.file.originalname}`);
@@ -117,7 +123,10 @@ app.post('/post', upload.single('file'), async (req, res) => {
     });
 
     res.json(postDoc);
-  });
+  } catch (error) {
+    console.error('Error creating post:', error);
+    res.status(500).json({ error: 'An error occurred while creating the post' });
+  }
 });
 
 app.put('/post', upload.single('file'), async (req, res) => {
