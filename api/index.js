@@ -30,7 +30,7 @@ const storage = getStorage();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: 'https://guts-z422.vercel.app',
+  origin: 'https://gutss.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
