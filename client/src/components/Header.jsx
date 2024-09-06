@@ -20,6 +20,7 @@ const Header = () => {
     } else {
       fetch(`${apiBaseUrl}/profile`, {
         method: "GET",
+        credentials: 'include',
       })
         .then((response) => {
           if (response.ok) {
@@ -48,6 +49,7 @@ const Header = () => {
   const logout = () => {
     fetch(`${apiBaseUrl}/logout`, { 
       method: "POST",
+      credentials: 'include',
     })
       .then((response) => {
         if (response.ok) {

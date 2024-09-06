@@ -39,6 +39,7 @@ export default function EditPost() {
       const response = await fetch(`${apiBaseUrl}/post`, {
         method: "PUT",
         body: data, 
+        credentials: 'include',
       });
   
       if (!response.ok) {
@@ -58,6 +59,7 @@ export default function EditPost() {
       `${apiBaseUrl}/post/${id}`,
       {
         method: "DELETE",
+        credentials: 'include',
       }
     );
     if (response.ok) {
