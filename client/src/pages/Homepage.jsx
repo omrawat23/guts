@@ -4,7 +4,7 @@ const Homepage = ({ userId }) => {
   const [userPosts, setUserPosts] = useState([]);
 
   useEffect(() => {
-    // Fetch user's blog posts from an API endpoint
+
     fetch(`/posts?userId=${userId}`)
       .then(response => {
         if (!response.ok) {

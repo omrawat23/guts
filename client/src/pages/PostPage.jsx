@@ -22,7 +22,7 @@ export default function PostPage() {
   if (!postInfo) return null;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-900">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-900 mt-16">
       <div className="w-full max-w-3xl bg-gray-800 bg-opacity-80 p-6 rounded-lg shadow-lg">
         <h1 className="text-4xl font-bold text-gray-100 mb-4">
           {postInfo.title}
