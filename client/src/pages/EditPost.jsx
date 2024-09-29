@@ -6,7 +6,7 @@ import vid from "../assets/guts1.mp4"; // Video asset
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditPost() {
-  const { id } = useParams();
+  const { id, userId } = useParams(); // Assuming you have userId in the route parameters
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
@@ -15,7 +15,7 @@ export default function EditPost() {
   const [redirectToHome, setRedirectToHome] = useState(false); // New state for redirection to home
 
   useEffect(() => {
-    fetch(`${apiBaseUrl}/post/` + id)
+    fetch(`${apiBaseUrl}/post/${id}`)
       .then((response) => response.json())
       .then((postInfo) => {
         setTitle(postInfo.title);
@@ -36,7 +36,7 @@ export default function EditPost() {
       if (files?.[0]) {
         data.set("file", files[0]);
       }
-      const response = await fetch(`${apiBaseUrl}/post`, {
+      const response = await fetch(`${apiBaseUrl}/user/${userId}/post/${id}`, {
         method: "PUT",
         body: data, 
         credentials: 'include',
@@ -53,10 +53,9 @@ export default function EditPost() {
     }
   }
   
-
   const Delete = async () => {
     const response = await fetch(
-      `${apiBaseUrl}/post/${id}`,
+      `${apiBaseUrl}/user/${userId}/post/${id}`,
       {
         method: "DELETE",
         credentials: 'include',
