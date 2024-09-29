@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import Editor from "../Editor";
 import Button from "../components/ui/button"; // Assuming you have a Button component in your project
 import vid from "../assets/guts1.mp4"; // Video asset
+import { UserContext } from "../UserContext"; // Import UserContext
+
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditPost() {
-  const { id, userId } = useParams(); // Assuming you have userId in the route parameters
+  const { id } = useParams(); // Get the post ID from the route parameters
+  const { userInfo } = useContext(UserContext); // Access userInfo from context
   const [title, setTitle] = useState("");
   const [summary, setSummary] = useState("");
   const [content, setContent] = useState("");
@@ -36,26 +39,26 @@ export default function EditPost() {
       if (files?.[0]) {
         data.set("file", files[0]);
       }
-      const response = await fetch(`${apiBaseUrl}/user/${userId}/post/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/user/${userInfo.id}/post/${id}`, {
         method: "PUT",
         body: data, 
         credentials: 'include',
       });
-  
+
       if (!response.ok) {
         throw new Error(`Failed to update post: ${response.statusText}`);
       }
-  
+
       setRedirect(true);
     } catch (error) {
       console.error('Error updating post:', error);
       alert('An error occurred while updating the post. Please try again later.');
     }
   }
-  
+
   const Delete = async () => {
     const response = await fetch(
-      `${apiBaseUrl}/user/${userId}/post/${id}`,
+      `${apiBaseUrl}/user/${userInfo.id}/post/${id}`,
       {
         method: "DELETE",
         credentials: 'include',
