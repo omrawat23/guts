@@ -71,6 +71,11 @@ export default function IndexPage() {
         {(!userInfo.id) && (
           <div className="text-center my-8">
             <p className="text-muted-foreground">You need to sign up or log in to create posts.</p><br></br>
+            <Link to="/login">
+              <Button>
+                Sign In
+              </Button>
+            </Link>
             <Link to="/register">
               <Button>
                 Sign Up
