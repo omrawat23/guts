@@ -126,6 +126,7 @@ app.post('/user/:userId/post', upload.single('file'), async (req, res) => {
       });
     });
 
+    // Ensure the logged-in user is the same as the userId in the URL
     if (info.id !== userId) {
       return res.status(403).json({ error: 'You are not authorized to create a post for this user' });
     }
@@ -150,16 +151,20 @@ app.post('/user/:userId/post', upload.single('file'), async (req, res) => {
   }
 });
 
-
-app.put('/post', upload.single('file'), async (req, res) => {
+// PUT to update a specific user's post
+app.put('/user/:userId/post/:id', upload.single('file'), async (req, res) => {
   const { token } = req.cookies;
+  const { userId } = req.params;
+  
   jwt.verify(token, secret, {}, async (err, info) => {
-    if (err) throw err;
+    if (err) return res.status(401).json({ error: 'Unauthorized' });
 
     const { id, title, summary, content } = req.body;
     const postDoc = await Post.findById(id);
-    if (postDoc.author.toString() !== info.id) {
-      return res.status(400).json('you are not the author');
+    
+    // Check if the author of the post is the logged-in user
+    if (postDoc.author.toString() !== userId) {
+      return res.status(403).json({ error: 'You are not authorized to update this post' });
     }
 
     let imageUrl = postDoc.cover;
@@ -174,6 +179,7 @@ app.put('/post', upload.single('file'), async (req, res) => {
   });
 });
 
+// GET all posts (optional; keep if needed)
 app.get('/post', async (req, res) => {
   const posts = await Post.find()
     .populate('author', ['username'])
@@ -182,19 +188,25 @@ app.get('/post', async (req, res) => {
   res.json(posts);
 });
 
+// GET a specific post
 app.get('/post/:id', async (req, res) => {
   const postDoc = await Post.findById(req.params.id).populate('author', ['username']);
   res.json(postDoc);
 });
 
-app.delete('/post/:id', async (req, res) => {
+// DELETE a specific user's post
+app.delete('/user/:userId/post/:id', async (req, res) => {
   const { token } = req.cookies;
+  const { userId } = req.params;
+  
   jwt.verify(token, secret, {}, async (err, info) => {
     if (err) return res.status(401).json({ error: 'Unauthorized' });
 
-    const postDoc = await Post.findById(req.params.id);
+    const postDoc = await Post.findById(id);
     if (!postDoc) return res.status(404).json({ error: 'Post not found' });
-    if (postDoc.author.toString() !== info.id) {
+
+    // Check if the author of the post is the logged-in user
+    if (postDoc.author.toString() !== userId) {
       return res.status(403).json({ error: 'You are not authorized to delete this post' });
     }
 
@@ -202,6 +214,7 @@ app.delete('/post/:id', async (req, res) => {
     res.json({ message: 'Post deleted successfully' });
   });
 });
+
 
 const PORT = 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
