@@ -11,7 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert"
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
-export default function IndexPage() {
+export default function IndexPage({ userId }) {
   const [posts, setPosts] = useState([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
@@ -23,7 +23,7 @@ export default function IndexPage() {
     if (loading || !hasMore) return
     setLoading(true)
     try {
-      const response = await fetch(`${apiBaseUrl}/post?page=${page}&limit=10`)
+      const response = await fetch(`${apiBaseUrl}/user/${userId}/posts?page=${page}&limit=10`)
       if (!response.ok) throw new Error('Failed to fetch posts')
       const newPosts = await response.json()
       setPosts((prevPosts) => {
@@ -43,7 +43,7 @@ export default function IndexPage() {
 
   useEffect(() => {
     fetchPosts()
-  }, [])
+  }, [userId])
 
   useEffect(() => {
     if (inView) {
@@ -57,7 +57,7 @@ export default function IndexPage() {
       <Intro />
       <main className="container mx-auto px-4 py-8">
        
-        <h1 className="text-4xl font-bold text-primary my-8 text-center">Latest Blogs</h1>
+        <h1 className="text-4xl font-bold text-primary my-8 text-center">User's Blogs</h1>
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertTitle>Error</AlertTitle>
