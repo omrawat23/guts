@@ -1,37 +1,45 @@
-// import ReactQuill from "react-quill";
-import 'react-quill/dist/quill.snow.css';
-import {useState} from "react";
-import {Navigate} from "react-router-dom";
+import React, { useState, useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { UserContext } from "../UserContext"; // Make sure to import your UserContext
 import Editor from "../Editor";
-import vid from "../assets/guts1.mp4"
+import vid from "../assets/guts1.mp4";
+
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 export default function CreatePost() {
-  const [title,setTitle] = useState('');
-  const [summary,setSummary] = useState('');
-  const [content,setContent] = useState('');
+  const { userInfo } = useContext(UserContext); // Access userInfo from context
+  const [title, setTitle] = useState('');
+  const [summary, setSummary] = useState('');
+  const [content, setContent] = useState('');
   const [files, setFiles] = useState('');
   const [redirect, setRedirect] = useState(false);
+
   async function createNewPost(ev) {
+    ev.preventDefault(); // Move this line to the top of the function
+
     const data = new FormData();
     data.set('title', title);
     data.set('summary', summary);
     data.set('content', content);
-    data.set('file', files[0]);
-    ev.preventDefault();
-    const response = await fetch(`${apiBaseUrl}/user/:userId/post`, {
+    if (files.length > 0) {
+      data.set('file', files[0]);
+    }
+
+    const response = await fetch(`${apiBaseUrl}/user/${userInfo.id}/post`, {
       method: 'POST',
       body: data,
       credentials: 'include',
     });
+
     if (response.ok) {
       setRedirect(true);
     }
   }
 
   if (redirect) {
-    return <Navigate to={'/'} />
+    return <Navigate to="/" />;
   }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
       <video
