@@ -55,6 +55,7 @@ const Header = () => {
         if (response.ok) {
           setUserInfo(null);
           localStorage.removeItem("userInfo"); // Clear session on logout
+          window.location.href = '/';
         } else {
           console.error("Failed to log out");
         }
@@ -163,7 +164,7 @@ const Header = () => {
                       asChild
                       className="text-white hover:text-gray-600"
                     >
-                      <Link to="/login">Log in</Link>
+                      <Link to="/login">Sign In</Link>
                     </Button>
                   </li>
                   <li>
@@ -171,7 +172,7 @@ const Header = () => {
                       asChild
                       className="text-white hover:text-gray-600"
                     >
-                      <Link to="/register">SIGN IN</Link>
+                      <Link to="/register">Sign Up</Link>
                     </Button>
                   </li>
                 </>
