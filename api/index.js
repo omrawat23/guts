@@ -99,15 +99,36 @@ res.cookie('token', '', {
 }).json('ok');
 });
 
-app.post('/post', upload.single('file'), async (req, res) => {
+// GET posts for a specific user
+app.get('/user/:userId/posts', async (req, res) => {
+  const { userId } = req.params;
   try {
-    const { token } = req.cookies;
+    const posts = await Post.find({ author: userId })
+      .populate('author', ['username'])
+      .sort({ createdAt: -1 })
+      .limit(20);
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while fetching posts' });
+  }
+});
+
+// POST a new post for a specific user
+app.post('/user/:userId/post', upload.single('file'), async (req, res) => {
+  const { userId } = req.params;
+  const { token } = req.cookies;
+
+  try {
     const info = await new Promise((resolve, reject) => {
       jwt.verify(token, secret, {}, (err, info) => {
         if (err) reject(err);
         resolve(info);
       });
     });
+
+    if (info.id !== userId) {
+      return res.status(403).json({ error: 'You are not authorized to create a post for this user' });
+    }
 
     const { title, summary, content } = req.body;
     const storageRef = ref(storage, `images/${Date.now()}_${req.file.originalname}`);
@@ -119,7 +140,7 @@ app.post('/post', upload.single('file'), async (req, res) => {
       summary,
       content,
       cover: imageUrl,
-      author: info.id,
+      author: userId, // Use the userId from the URL
     });
 
     res.json(postDoc);
@@ -128,6 +149,7 @@ app.post('/post', upload.single('file'), async (req, res) => {
     res.status(500).json({ error: 'An error occurred while creating the post' });
   }
 });
+
 
 app.put('/post', upload.single('file'), async (req, res) => {
   const { token } = req.cookies;
