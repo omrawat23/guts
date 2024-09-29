@@ -56,7 +56,8 @@ export default function EditPost() {
     }
   }
 
-  const Delete = async () => {
+const Delete = async () => {
+  try {
     const response = await fetch(
       `${apiBaseUrl}/user/${userInfo.id}/post/${id}`,
       {
@@ -64,10 +65,19 @@ export default function EditPost() {
         credentials: 'include',
       }
     );
-    if (response.ok) {
-      setRedirectToHome(true); // Set redirectToHome to true on successful deletion
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to delete post');
     }
-  };
+
+    setRedirectToHome(true); // Set redirectToHome to true on successful deletion
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    alert('An error occurred while deleting the post. Please try again later.');
+  }
+};
+
 
   if (redirectToHome) {
     return <Navigate to="/" />; // Redirect to the homepage

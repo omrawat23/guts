@@ -197,15 +197,14 @@ app.get('/post/:id', async (req, res) => {
 // DELETE a specific user's post
 app.delete('/user/:userId/post/:id', async (req, res) => {
   const { token } = req.cookies;
-  const { userId } = req.params;
-  
+  const { userId, id } = req.params; // Ensure you're getting the post id here
+
   jwt.verify(token, secret, {}, async (err, info) => {
     if (err) return res.status(401).json({ error: 'Unauthorized' });
 
     const postDoc = await Post.findById(id);
     if (!postDoc) return res.status(404).json({ error: 'Post not found' });
 
-    // Check if the author of the post is the logged-in user
     if (postDoc.author.toString() !== userId) {
       return res.status(403).json({ error: 'You are not authorized to delete this post' });
     }
@@ -214,6 +213,7 @@ app.delete('/user/:userId/post/:id', async (req, res) => {
     res.json({ message: 'Post deleted successfully' });
   });
 });
+
 
 
 const PORT = 4000;
