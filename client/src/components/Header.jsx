@@ -114,7 +114,7 @@ const Header = () => {
                   asChild
                   className="text-white hover:text-gray-200"
                 >
-                  <Link to="/register">SIGN IN</Link>
+                  <Link to="/register">SIGN Up</Link>
                 </Button>
               </li>
             </>

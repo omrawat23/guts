@@ -8,7 +8,8 @@ import Intro from "./Intro"
 import { Loader2 } from "lucide-react"
 import Button from "../components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "../components/ui/alert"
-import { UserContext } from "../UserContext" // Adjust the path as necessary
+import { UserContext } from "../UserContext" 
+import { Link } from "react-router-dom"
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL
 
@@ -60,7 +61,7 @@ export default function IndexPage() {
       <Header />
       <Intro />
       <main className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-primary my-8 text-center">User's Blogs</h1>
+        <h1 className="text-4xl font-bold text-primary my-8 text-center">Latest's Blogs</h1>
         {error && (
           <Alert variant="destructive" className="mb-6">
             <AlertTitle>Error</AlertTitle>
@@ -69,10 +70,12 @@ export default function IndexPage() {
         )}
         {(!userInfo.id) && (
           <div className="text-center my-8">
-            <p className="text-muted-foreground">You need to sign up or log in to create posts.</p>
-            <Button onClick={() => {/* Logic to navigate to sign up page */}}>
-              Sign Up
-            </Button>
+            <p className="text-muted-foreground">You need to sign up or log in to create posts.</p><br></br>
+            <Link to="/register">
+              <Button>
+                Sign Up
+              </Button>
+            </Link>
           </div>
         )}
         {posts.length > 0 && (
